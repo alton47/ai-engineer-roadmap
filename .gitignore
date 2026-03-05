@@ -1,0 +1,24 @@
+# python
+__pycache__/
+*.pyc
+
+# virtual env
+.venv/
+venv/
+env/
+
+# mac
+.DS_Store
+
+# node (if frontend tooling later)
+node_modules/
+
+# data
+data/raw/*
+data/tmp/
+
+# logs
+*.log
+
+# secrets
+.env

@@ -1,5 +1,5 @@
 """
-AI Roles Radar — Free Job Scraper
+AI Engineer Roadmap — Free Job Scraper
 ───────────────────────────────────
 Scrapes AI/ML engineering jobs from 100% free, public sources.
 No API keys. No paid services. No account required.
@@ -11,15 +11,6 @@ Sources:
   • Jobicy           — jobicy.com/api/v0/jobs             (free remote JSON API)
   • GitHub Jobs RSS  — github.com (search via public RSS)
 
-Run:
-  pip install requests beautifulsoup4 tqdm
-  python scrape_jobs.py
-  python scrape_jobs.py --sources remoteok arbeitnow --limit 200
-  python scrape_jobs.py --source hn --hn-thread 43332022
-
-Output:
-  data/raw/YYYY-MM-DD_<source>_<N>jobs.json   ← timestamped, one file per source run
-  data/raw/scrape_log.jsonl                   ← append-only audit trail
 """
 
 import re
