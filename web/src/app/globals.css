@@ -1,7 +1,127 @@
 @import "tailwindcss";
-@config "../../tailwind.config.js";
 
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap");
+
+@theme {
+  /* Fonts */
+  --font-sans: "Syne", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Colors */
+  --color-bg: #030303;
+  --color-bg1: #0a0a0a;
+  --color-bg2: #101010;
+  --color-bg3: #181818;
+  --color-bg4: #202020;
+  --color-line: #1e1e1e;
+  --color-line2: #2a2a2a;
+  --color-hi: #f0f0f0;
+  --color-tx: #c8c8c8;
+  --color-muted: #707070;
+  --color-faint: #383838;
+  --color-acid: #b8ff3c;
+  --color-cyan: #3cf0ff;
+  --color-violet: #9d7cff;
+  --color-coral: #ff6b4a;
+  --color-emerald: #3dffa0;
+  --color-gold: #ffc93c;
+  --color-rose: #ff4a7a;
+
+  /* Animations */
+  --animation-fade-up: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animation-fade-in: fadeIn 0.35s ease both;
+  --animation-slide-in: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animation-float: float 7s ease-in-out infinite;
+  --animation-spin-slow: spin 12s linear infinite;
+  --animation-pulse-acid: pulseAcid 2.5s ease-in-out infinite;
+  --animation-bar-fill: barFill 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animation-shimmer: shimmer 2s linear infinite;
+  --animation-orbit: orbit 8s linear infinite;
+
+  /* Keyframes */
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes slideIn {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+  @keyframes pulseAcid {
+    0%,
+    100% {
+      opacity: 0.7;
+      box-shadow: 0 0 0 0 rgba(184, 255, 60, 0.4);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 0 0 8px rgba(184, 255, 60, 0);
+    }
+  }
+  @keyframes barFill {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes orbit {
+    0% {
+      transform: rotate(0deg) translateX(60px) rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg) translateX(60px) rotate(-360deg);
+    }
+  }
+
+  /* Shadows */
+  --shadow-acid:
+    0 0 32px rgba(184, 255, 60, 0.22), 0 0 64px rgba(184, 255, 60, 0.08);
+  --shadow-cyan:
+    0 0 32px rgba(60, 240, 255, 0.2), 0 0 64px rgba(60, 240, 255, 0.06);
+  --shadow-violet: 0 0 32px rgba(157, 124, 255, 0.2);
+  --shadow-card:
+    0 1px 0 rgba(255, 255, 255, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --shadow-glow-sm: 0 0 12px rgba(184, 255, 60, 0.3);
+}
 
 /* ─── CSS Variables ──────────────────────────────────────────────────────── */
 :root {
