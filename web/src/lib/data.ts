@@ -198,9 +198,10 @@ export function computeStats(jobs: Job[]): AggregatedData["stats"] {
     jobs.forEach((j) => {
       const vals = fn(j);
       const arr = Array.isArray(vals) ? vals : [vals];
+
       arr.forEach((v) => {
-        if (v && v !== "not specified" && v !== "unknown" && v !== "")
-          c[v] = (c[v] ?? 0) + 1;
+        if (v && v.trim() !== "")
+          c[v.toLowerCase().trim()] = (c[v.toLowerCase().trim()] ?? 0) + 1;
       });
     });
     return Object.entries(c)
