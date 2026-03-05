@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-// import { DEMO_JOBS, DEMO_TREND, computeStats } from "@/lib/data";
-// import type { AggregatedData } from "@/lib/data";
+import { DEMO_JOBS, DEMO_TREND, computeStats } from "@/lib/data";
+import type { AggregatedData } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
