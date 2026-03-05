@@ -40,3 +40,4 @@ next-env.d.ts
 # OS & Misc
 .DS_Store
 Thumbs.db
+data/salary_h1b_cache.json
