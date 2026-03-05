@@ -241,12 +241,12 @@ export default function Jobs({ data }: { data: AggregatedData }) {
                     <td className="py-2.5 px-3 border-b border-line/40 text-[12px] text-muted whitespace-nowrap">
                       {j.location}
                     </td>
-                    <td className="py-2.5 px-3 border-b border-line/40">
+                    <td className="py-2.5 px-3 border-b border-line/40 whitespace-nowrap">
                       <Chip color="violet">
                         {j.role_type?.split("/")[0]?.trim() ?? "—"}
                       </Chip>
                     </td>
-                    <td className="py-2.5 px-3 border-b border-line/40">
+                    <td className="py-2.5 px-3 border-b border-line/40 whitespace-nowrap">
                       <RemoteChip v={j.remote_policy} />
                     </td>
                     <td className="py-2.5 px-3 border-b border-line/40 font-mono text-[11px] text-muted whitespace-nowrap">
@@ -290,13 +290,15 @@ export default function Jobs({ data }: { data: AggregatedData }) {
                 >
                   ← prev
                 </button>
+
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const pg = Math.min(Math.max(1, page - 2 + i), totalPages);
+                  const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+                  const pg = start + i;
                   return (
                     <button
-                      key={pg}
+                      key={`page-${pg}`}
                       onClick={() => setPage(pg)}
-                      className={`px-3 py-1 rounded-lg border font-mono text-[11px] transition-colors ${pg === page ? "bg-acid border-acid text-bg font-bold" : "border-line text-muted hover:border-line2 hover:text-tx"}`}
+                      className={`px-3 py-1 rounded-lg border font-mono text-[11px] transition-colors cursor-pointer ${pg === page ? "bg-acid border-acid text-bg font-bold" : "border-line text-muted hover:border-line2 hover:text-tx"}`}
                     >
                       {pg}
                     </button>
