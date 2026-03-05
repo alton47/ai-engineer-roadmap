@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import type { AggregatedData } from "@/lib/data";
 import { computeStats, DEMO_JOBS, DEMO_TREND } from "@/lib/data";
-import Sidebar from "@/components/Sidebar";
 import { LoadScreen, DemoBanner } from "@/lib/ui";
-import Overview from "@/components/pages/Overview";
-import Skills from "@/components/pages/Skills";
-import Salary from "@/components/pages/Salary";
-import Trends from "@/components/pages/Trends";
-import Jobs from "@/components/pages/Jobs";
-import Graph from "@/components/pages/Graph";
-import Roadmap from "@/components/pages/Roadmap";
-import Sources from "@/components/pages/Sources";
+import Sidebar from "./components/Sidebar";
+import Overview from "./components/pages/Overview";
+import Skills from "./components/pages/Skills";
+import Salary from "./components/pages/Salary";
+import Trends from "./components/pages/Trends";
+import Jobs from "./components/pages/Jobs";
+import Graph from "./components/pages/Graph";
+import Roadmap from "./components/pages/Roadmap";
+import Sources from "./components/pages/Sources";
 
 export type PageId =
   | "overview"
