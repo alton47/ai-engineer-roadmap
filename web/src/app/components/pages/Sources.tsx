@@ -13,6 +13,12 @@ import {
 
 const FREE_SOURCES = [
   {
+    name: "H-1B DOL database",
+    url: "https://h1bgrader.com/",
+    status: "live",
+    note: "Who's Hiring monthly thread · completely free · highest quality",
+  },
+  {
     name: "RemoteOK",
     url: "https://remoteok.com/api",
     status: "live",
@@ -30,12 +36,7 @@ const FREE_SOURCES = [
     status: "live",
     note: "Free tier · 50 results/call · filter by tag=ai",
   },
-  {
-    name: "HN Algolia",
-    url: "https://hn.algolia.com/api",
-    status: "live",
-    note: "Who's Hiring monthly thread · completely free · highest quality",
-  },
+
   {
     name: "The Muse",
     url: "https://www.themuse.com/api",

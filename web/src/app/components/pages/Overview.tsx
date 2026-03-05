@@ -89,7 +89,7 @@ export default function Overview({ data }: { data: AggregatedData }) {
           />
           <StatCard
             value={senSal ? `$${Math.round(senSal / 1000)}k` : "—"}
-            label="Median senior salary"
+            label="Median senior salary (USD)"
             sub="↑ 12% year-over-year"
             color="#3cf0ff"
             delay={0.05}
