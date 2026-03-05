@@ -23,13 +23,11 @@ export default function Overview({ data }: { data: AggregatedData }) {
   const maxSk = top[0]?.count ?? 1;
   const roles = useMemo(
     () =>
-      (stats.role_types ?? [])
-        .slice(0, 7)
-        .map((r) => ({
-          name: r.name,
-          value: r.count,
-          color: getColor(ROLE_COLORS, r.name),
-        })),
+      (stats.role_types ?? []).slice(0, 7).map((r) => ({
+        name: r.name,
+        value: r.count,
+        color: getColor(ROLE_COLORS, r.name),
+      })),
     [stats],
   );
   const remote = useMemo(
@@ -45,11 +43,13 @@ export default function Overview({ data }: { data: AggregatedData }) {
   const senTotal = seniors.reduce((a, b) => a + b.count, 0) || 1;
 
   const senSal = stats.salary?.by_seniority?.senior;
-  const remN = (stats.remote_policy ?? [])
+
+  const remoteN = (stats.remote_policy ?? [])
     .filter((r) => r.name === "remote" || r.name === "hybrid")
+
     .reduce((a, b) => a + b.count, 0);
   const remPct = meta.total_jobs
-    ? Math.round((remN / meta.total_jobs) * 100)
+    ? Math.round((remoteN / meta.total_jobs) * 100)
     : 0;
   const srcStr = (stats.sources ?? [])
     .map((s) => s.name)
@@ -97,7 +97,7 @@ export default function Overview({ data }: { data: AggregatedData }) {
           <StatCard
             value={`${remPct}%`}
             label="Remote or hybrid"
-            sub={`${remN.toLocaleString()} positions`}
+            sub={`${remoteN.toLocaleString()} positions`}
             color="#3dffa0"
             delay={0.1}
           />
