@@ -1,0 +1,2469 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI Roles Radar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --bg: #000;
+        --bg1: #0a0a0a;
+        --bg2: #111;
+        --bg3: #1a1a1a;
+        --bg4: #222;
+        --b: #2a2a2a;
+        --b2: #333;
+        --b3: #3a3a3a;
+        --t: #ededed;
+        --t2: #888;
+        --t3: #444;
+        --hi: #fff;
+        --lime: #c8ff57;
+        --blue: #60a5fa;
+        --red: #f87171;
+        --orange: #fb923c;
+        --purple: #a78bfa;
+        --green: #4ade80;
+        --mono: "Geist Mono", monospace;
+        --sans: "Geist", sans-serif;
+        --r: 6px;
+        --r2: 10px;
+        --sb: 216px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--t);
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9000;
+        opacity: 0.018;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 2px;
+      }
+      ::selection {
+        background: rgba(200, 255, 87, 0.18);
+      }
+
+      /* SIDEBAR */
+      .sb {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--sb);
+        background: var(--bg1);
+        border-right: 1px solid var(--b);
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+      }
+      .logo {
+        padding: 18px 16px;
+        border-bottom: 1px solid var(--b);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .lmark {
+        width: 26px;
+        height: 26px;
+        border-radius: 5px;
+        background: var(--hi);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .lmark svg {
+        width: 12px;
+        height: 12px;
+      }
+      .ltext {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--hi);
+        line-height: 1.2;
+      }
+      .lsub {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--t3);
+        letter-spacing: 0.3px;
+        margin-top: 1px;
+      }
+      .nav {
+        flex: 1;
+        padding: 6px 0;
+        overflow-y: auto;
+      }
+      .nsec {
+        font-family: var(--mono);
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--t3);
+        padding: 14px 14px 4px;
+      }
+      .ni {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 6px 14px;
+        font-size: 13px;
+        color: var(--t2);
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        transition: all 0.1s;
+        user-select: none;
+      }
+      .ni:hover {
+        color: var(--t);
+        background: var(--bg2);
+      }
+      .ni.on {
+        color: var(--hi);
+        background: var(--bg3);
+        border-left-color: var(--hi);
+        font-weight: 500;
+      }
+      .ni svg {
+        width: 14px;
+        height: 14px;
+        opacity: 0.5;
+        flex-shrink: 0;
+      }
+      .ni.on svg {
+        opacity: 1;
+      }
+      .sbfoot {
+        padding: 12px 14px;
+        border-top: 1px solid var(--b);
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        flex-shrink: 0;
+      }
+      .coffee {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: var(--bg3);
+        border: 1px solid var(--b2);
+        color: var(--t);
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 7px 10px;
+        border-radius: var(--r);
+        text-decoration: none;
+        transition:
+          border-color 0.12s,
+          color 0.12s;
+      }
+      .coffee:hover {
+        border-color: var(--lime);
+        color: var(--lime);
+      }
+      .jcount {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--t3);
+        text-align: center;
+      }
+      .jcount strong {
+        color: var(--t2);
+      }
+
+      /* MAIN */
+      .main {
+        margin-left: var(--sb);
+        min-height: 100vh;
+      }
+
+      /* PAGES */
+      .page {
+        display: none;
+      }
+      .page.on {
+        display: block;
+        animation: fu 0.18s ease both;
+      }
+      @keyframes fu {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* PAGE HEADER */
+      .ph {
+        padding: 26px 28px 18px;
+        border-bottom: 1px solid var(--b);
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .phtitle {
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--hi);
+      }
+      .phsub {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 3px;
+        font-family: var(--mono);
+      }
+      .tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--bg3);
+        border: 1px solid var(--b2);
+        color: var(--t2);
+        white-space: nowrap;
+      }
+      .tag.live {
+        border-color: rgba(74, 222, 128, 0.3);
+        color: var(--green);
+      }
+      .tag.live::before {
+        content: "● ";
+        font-size: 7px;
+      }
+
+      /* CONTENT */
+      .ct {
+        padding: 22px 28px;
+      }
+
+      /* STATS ROW */
+      .srow {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .sc {
+        background: var(--bg1);
+        border: 1px solid var(--b);
+        border-radius: var(--r2);
+        padding: 16px 18px;
+        transition: border-color 0.15s;
+      }
+      .sc:hover {
+        border-color: var(--b2);
+      }
+      .sv {
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--hi);
+        line-height: 1;
+      }
+      .sl {
+        font-size: 12px;
+        color: var(--t2);
+        margin-top: 4px;
+      }
+      .sd {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--lime);
+        margin-top: 2px;
+      }
+
+      /* GRID */
+      .g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .g3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 14px;
+      }
+      .sp2 {
+        grid-column: span 2;
+      }
+      .full {
+        grid-column: 1/-1;
+      }
+
+      /* CARD */
+      .card {
+        background: var(--bg1);
+        border: 1px solid var(--b);
+        border-radius: var(--r2);
+        padding: 18px;
+        transition: border-color 0.15s;
+      }
+      .card:hover {
+        border-color: var(--b2);
+      }
+      .ctitle {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--t3);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      /* FILTERS */
+      .fb {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .fl {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--t3);
+        letter-spacing: 0.3px;
+        margin-right: 3px;
+      }
+      .btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 4px 11px;
+        border-radius: var(--r);
+        background: transparent;
+        border: 1px solid var(--b);
+        color: var(--t2);
+        cursor: pointer;
+        transition: all 0.1s;
+      }
+      .btn:hover {
+        border-color: var(--b2);
+        color: var(--t);
+      }
+      .btn.on {
+        background: var(--hi);
+        border-color: var(--hi);
+        color: var(--bg);
+        font-weight: 600;
+      }
+      .sep {
+        width: 1px;
+        height: 14px;
+        background: var(--b);
+        margin: 0 3px;
+        flex-shrink: 0;
+      }
+
+      /* BARS */
+      .bars {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .br {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .bn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--t2);
+        min-width: 105px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .bt {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--bg3);
+        overflow: hidden;
+      }
+      .bf {
+        height: 100%;
+        border-radius: 2px;
+        width: 0%;
+        background: var(--hi);
+        transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .bf.lime {
+        background: var(--lime);
+      }
+      .bf.blue {
+        background: var(--blue);
+      }
+      .bf.purple {
+        background: var(--purple);
+      }
+      .bf.red {
+        background: var(--red);
+      }
+      .bf.orange {
+        background: var(--orange);
+      }
+      .bc {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--t3);
+        min-width: 34px;
+      }
+
+      /* PILL CLOUD */
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: var(--bg3);
+        border: 1px solid var(--b);
+        color: var(--t2);
+        cursor: default;
+        transition: all 0.1s;
+      }
+      .pill:hover {
+        border-color: var(--b2);
+        color: var(--t);
+      }
+      .pill.p1 {
+        border-color: rgba(237, 237, 237, 0.18);
+        color: var(--hi);
+      }
+      .pill.p2 {
+        border-color: rgba(200, 255, 87, 0.22);
+        color: var(--lime);
+        background: rgba(200, 255, 87, 0.04);
+      }
+      .pill.p3 {
+        border-color: rgba(96, 165, 250, 0.18);
+        color: var(--blue);
+        background: rgba(96, 165, 250, 0.04);
+      }
+
+      /* DONUT */
+      .dw {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .dl {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .dlr {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--b);
+        font-size: 12px;
+        color: var(--t2);
+      }
+      .dlr:last-child {
+        border-bottom: none;
+      }
+      .dd {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dp {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--hi);
+      }
+
+      /* TABLE */
+      .tw {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--t3);
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--b);
+        text-align: left;
+        white-space: nowrap;
+        font-weight: 500;
+      }
+      td {
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--t2);
+        border-bottom: 1px solid rgba(42, 42, 42, 0.6);
+        white-space: nowrap;
+      }
+      tr:hover td {
+        background: var(--bg2);
+      }
+      .tdt {
+        font-weight: 500;
+        color: var(--t);
+        font-size: 13px;
+      }
+      .tdc {
+        color: var(--t3);
+        font-family: var(--mono);
+        font-size: 10px;
+        margin-top: 1px;
+      }
+      .chip {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--bg3);
+        border: 1px solid var(--b);
+      }
+      .chip.r {
+        border-color: rgba(74, 222, 128, 0.2);
+        color: var(--green);
+      }
+      .chip.h {
+        border-color: rgba(96, 165, 250, 0.2);
+        color: var(--blue);
+      }
+      .chip.o {
+        border-color: rgba(248, 113, 113, 0.2);
+        color: var(--red);
+      }
+      .chip.f {
+        border-color: rgba(167, 139, 250, 0.2);
+        color: var(--purple);
+      }
+      .empty {
+        text-align: center;
+        color: var(--t3);
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 48px 0;
+      }
+
+      /* ROADMAP */
+      .rm {
+        padding-left: 22px;
+        position: relative;
+      }
+      .rm::before {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(
+          to bottom,
+          var(--hi),
+          var(--b),
+          transparent
+        );
+      }
+      .rms {
+        position: relative;
+        margin-bottom: 22px;
+      }
+      .rmd {
+        position: absolute;
+        left: -18px;
+        top: 5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--hi);
+        box-shadow: 0 0 8px rgba(237, 237, 237, 0.35);
+      }
+      .rmd.dim {
+        background: var(--t3);
+        box-shadow: none;
+      }
+      .rmd.lime {
+        background: var(--lime);
+        box-shadow: 0 0 8px rgba(200, 255, 87, 0.35);
+      }
+      .rmph {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--t3);
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .rmt {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--hi);
+        margin-bottom: 4px;
+      }
+      .rmb {
+        font-size: 13px;
+        color: var(--t2);
+        line-height: 1.65;
+      }
+      .rmtags {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .rmtag {
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--bg3);
+        border: 1px solid var(--b);
+        color: var(--t3);
+      }
+
+      /* SOURCES */
+      .sgrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .src {
+        background: var(--bg2);
+        border: 1px solid var(--b);
+        border-radius: var(--r);
+        padding: 13px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .srcn {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--t);
+      }
+      .srcu {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--lime);
+        text-decoration: none;
+      }
+      .srcu:hover {
+        text-decoration: underline;
+      }
+      .srcm {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--t3);
+      }
+      pre {
+        background: var(--bg2);
+        border: 1px solid var(--b);
+        border-radius: var(--r);
+        padding: 16px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--t2);
+        line-height: 1.7;
+        overflow-x: auto;
+      }
+
+      /* CANVAS */
+      #c3d {
+        width: 100%;
+        height: 440px;
+        border-radius: var(--r2);
+        cursor: grab;
+        display: block;
+      }
+      #c3d:active {
+        cursor: grabbing;
+      }
+
+      /* SEARCH */
+      .si {
+        background: var(--bg2);
+        border: 1px solid var(--b);
+        color: var(--t);
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: var(--r);
+        width: 220px;
+        outline: none;
+        transition: border-color 0.1s;
+      }
+      .si:focus {
+        border-color: var(--b2);
+      }
+      .si::placeholder {
+        color: var(--t3);
+      }
+
+      /* CHECKER BG */
+      .chk {
+        background-image:
+          linear-gradient(45deg, #141414 25%, transparent 25%),
+          linear-gradient(-45deg, #141414 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #141414 75%),
+          linear-gradient(-45deg, transparent 75%, #141414 75%);
+        background-size: 16px 16px;
+        background-position:
+          0 0,
+          0 8px,
+          8px -8px,
+          -8px 0px;
+        background-color: var(--bg1);
+      }
+
+      @media (max-width: 920px) {
+        :root {
+          --sb: 46px;
+        }
+        .ltext,
+        .lsub,
+        .nsec,
+        .ni span,
+        .sbfoot .coffee span,
+        .sbfoot .jcount {
+          display: none;
+        }
+        .ni {
+          justify-content: center;
+          padding: 10px;
+          border-left: none;
+        }
+        .ni.on {
+          background: var(--bg3);
+          border-left: none;
+        }
+        .ni svg {
+          width: 18px;
+          height: 18px;
+          opacity: 0.6;
+          margin: 0;
+        }
+        .ph {
+          padding: 18px 14px 14px;
+        }
+        .ct {
+          padding: 14px;
+        }
+        .srow {
+          grid-template-columns: 1fr 1fr;
+        }
+        .g2,
+        .g3 {
+          grid-template-columns: 1fr;
+        }
+        .sp2,
+        .full {
+          grid-column: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sb">
+      <div class="logo">
+        <div class="lmark">
+          <svg viewBox="0 0 12 12" fill="none">
+            <path d="M6 1L11 3.5V8.5L6 11L1 8.5V3.5L6 1Z" fill="#000" />
+          </svg>
+        </div>
+        <div>
+          <div class="ltext">AI Roles Radar</div>
+          <div class="lsub">demo · v1.0</div>
+        </div>
+      </div>
+      <div class="nav">
+        <div class="nsec">Overview</div>
+        <div class="ni on" data-p="overview" onclick="nav(this)">
+          <svg viewBox="0 0 15 15" fill="currentColor">
+            <rect x="1" y="1" width="6" height="6" rx="1" />
+            <rect x="8" y="1" width="6" height="6" rx="1" />
+            <rect x="1" y="8" width="6" height="6" rx="1" />
+            <rect x="8" y="8" width="6" height="6" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="nsec">Explore</div>
+        <div class="ni" data-p="skills" onclick="nav(this)">
+          <svg viewBox="0 0 15 15" fill="currentColor">
+            <circle cx="7.5" cy="7.5" r="3" />
+            <circle
+              cx="7.5"
+              cy="7.5"
+              r="6.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width=".8"
+            />
+          </svg>
+          <span>Skills Map</span>
+        </div>
+        <div class="ni" data-p="salary" onclick="nav(this)">
+          <svg
+            viewBox="0 0 15 15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+          >
+            <rect x="1" y="4" width="13" height="9" rx="1" />
+            <path d="M5 4V3a2 2 0 014 0v1" />
+            <circle cx="7.5" cy="8.5" r="1.5" fill="currentColor" />
+          </svg>
+          <span>Salaries</span>
+        </div>
+        <div class="ni" data-p="trend" onclick="nav(this)">
+          <svg
+            viewBox="0 0 15 15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M1 12l3-4 3 2 4-5 2 1" />
+          </svg>
+          <span>Trends</span>
+        </div>
+        <div class="ni" data-p="jobs" onclick="nav(this)">
+          <svg viewBox="0 0 15 15" fill="currentColor">
+            <rect x="2" y="2.5" width="11" height="1.5" rx=".5" />
+            <rect x="2" y="6.5" width="11" height="1.5" rx=".5" />
+            <rect x="2" y="10.5" width="7" height="1.5" rx=".5" />
+          </svg>
+          <span>Job Browser</span>
+        </div>
+        <div class="ni" data-p="graph" onclick="nav(this)">
+          <svg viewBox="0 0 15 15" fill="currentColor">
+            <circle cx="7.5" cy="7.5" r="1.5" />
+            <circle cx="2.5" cy="3.5" r="1.5" />
+            <circle cx="12.5" cy="3.5" r="1.5" />
+            <circle cx="2.5" cy="11.5" r="1.5" />
+            <circle cx="12.5" cy="11.5" r="1.5" />
+            <line
+              x1="4"
+              y1="3.5"
+              x2="11"
+              y2="3.5"
+              stroke="currentColor"
+              stroke-width=".8"
+            />
+            <line
+              x1="4"
+              y1="11.5"
+              x2="11"
+              y2="11.5"
+              stroke="currentColor"
+              stroke-width=".8"
+            />
+            <line
+              x1="3.2"
+              y1="5"
+              x2="7.1"
+              y2="6.3"
+              stroke="currentColor"
+              stroke-width=".8"
+            />
+            <line
+              x1="11.8"
+              y1="5"
+              x2="7.9"
+              y2="6.3"
+              stroke="currentColor"
+              stroke-width=".8"
+            />
+          </svg>
+          <span>Skill Graph</span>
+        </div>
+        <div class="nsec">Learn</div>
+        <div class="ni" data-p="roadmap" onclick="nav(this)">
+          <svg
+            viewBox="0 0 15 15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M1 7.5h13M9 4.5l4 3-4 3" />
+          </svg>
+          <span>Roadmaps</span>
+        </div>
+        <div class="ni" data-p="sources" onclick="nav(this)">
+          <svg
+            viewBox="0 0 15 15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+          >
+            <path d="M7.5 1L14 4v7l-6.5 3L1 11V4L7.5 1z" />
+            <path d="M7.5 7.5L14 4M7.5 7.5L1 4M7.5 7.5V14" />
+          </svg>
+          <span>Sources</span>
+        </div>
+      </div>
+      <div class="sbfoot">
+        <a class="coffee" href="https://buymeacoffee.com" target="_blank"
+          >☕ <span>Buy me a coffee</span></a
+        >
+        <div class="jcount"><strong>1,765</strong> jobs · demo data</div>
+      </div>
+    </nav>
+
+    <main class="main">
+      <!-- OVERVIEW -->
+      <div class="page on" id="page-overview">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Dashboard</div>
+            <div class="phsub">
+              1,765 real postings · 6 markets · scraped Jan 2026
+            </div>
+          </div>
+          <span class="tag live">demo data</span>
+        </div>
+        <div class="ct">
+          <div class="srow">
+            <div class="sc">
+              <div class="sv">1,765</div>
+              <div class="sl">Jobs analyzed</div>
+              <div class="sd">LA · NY · London · Berlin · AMS · India</div>
+            </div>
+            <div class="sc">
+              <div class="sv">$178k</div>
+              <div class="sl">Median senior salary (US)</div>
+              <div class="sd">↑ 12% vs 2024</div>
+            </div>
+            <div class="sc">
+              <div class="sv">63%</div>
+              <div class="sl">Remote or hybrid</div>
+              <div class="sd">↑ from 48% in 2023</div>
+            </div>
+            <div class="sc">
+              <div class="sv">42</div>
+              <div class="sl">Skills tracked</div>
+              <div class="sd">Top: Python · LLMs · RAG</div>
+            </div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="ctitle">Top Skills</div>
+              <div class="bars" id="ov-skills"></div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Role Types</div>
+              <div class="dw">
+                <svg id="d1" width="130" height="130"></svg>
+                <div class="dl" id="d1l"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Frameworks</div>
+              <div class="bars" id="ov-fw"></div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Remote Policy</div>
+              <div class="dw">
+                <svg id="d2" width="130" height="130"></svg>
+                <div class="dl" id="d2l"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="page" id="page-skills">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Skills Map</div>
+            <div class="phsub">Every skill ranked by frequency</div>
+          </div>
+        </div>
+        <div class="ct">
+          <div class="fb">
+            <span class="fl">Filter:</span>
+            <button class="btn on" onclick="fcloud('all', this)">All</button>
+            <button class="btn" onclick="fcloud('lang', this)">
+              Languages
+            </button>
+            <button class="btn" onclick="fcloud('framework', this)">
+              Frameworks
+            </button>
+            <button class="btn" onclick="fcloud('cloud', this)">Cloud</button>
+            <button class="btn" onclick="fcloud('llm', this)">
+              LLM Providers
+            </button>
+            <button class="btn" onclick="fcloud('vector', this)">
+              Vector DBs
+            </button>
+          </div>
+          <div class="card full" style="margin-bottom: 14px">
+            <div class="pills" id="scloud"></div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="ctitle">Cloud Platforms</div>
+              <div class="bars" id="cloud-b"></div>
+            </div>
+            <div class="card">
+              <div class="ctitle">LLM Providers</div>
+              <div class="bars" id="llm-b"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SALARY -->
+      <div class="page" id="page-salary">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Salary Explorer</div>
+            <div class="phsub">
+              Postings with disclosed compensation · all figures USD/yr
+            </div>
+          </div>
+        </div>
+        <div class="ct">
+          <div class="fb">
+            <span class="fl">Seniority:</span>
+            <button class="btn on" onclick="fsal('all', this)">All</button>
+            <button class="btn" onclick="fsal('junior', this)">Junior</button>
+            <button class="btn" onclick="fsal('mid', this)">Mid</button>
+            <button class="btn" onclick="fsal('senior', this)">Senior</button>
+            <button class="btn" onclick="fsal('staff', this)">Staff+</button>
+          </div>
+          <div class="srow">
+            <div class="sc">
+              <div class="sv">$95k</div>
+              <div class="sl">Junior · 0–2 yrs</div>
+            </div>
+            <div class="sc">
+              <div class="sv">$148k</div>
+              <div class="sl">Mid · 2–5 yrs</div>
+            </div>
+            <div class="sc">
+              <div class="sv">$195k</div>
+              <div class="sl">Senior · 5+ yrs</div>
+            </div>
+            <div class="sc">
+              <div class="sv">$260k</div>
+              <div class="sl">Staff / Principal</div>
+            </div>
+          </div>
+          <div class="card full" style="margin-bottom: 14px">
+            <div class="ctitle">Median Salary by Role Type</div>
+            <svg
+              id="salsvg"
+              style="width: 100%; height: 250px; display: block"
+            ></svg>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="ctitle">By Market</div>
+              <div class="bars" id="sal-loc"></div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Disclosure Rate</div>
+              <div class="bars" id="sal-disc"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRENDS -->
+      <div class="page" id="page-trend">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Demand Trends</div>
+            <div class="phsub">
+              How volume, salaries, and skills shifted by year
+            </div>
+          </div>
+        </div>
+        <div class="ct">
+          <div class="fb">
+            <span class="fl">View:</span>
+            <button class="btn on" onclick="showT('volume', this)">
+              Job Volume
+            </button>
+            <button class="btn" onclick="showT('salary', this)">
+              Avg Salary
+            </button>
+            <button class="btn" onclick="showT('skill', this)">
+              RAG vs Agents
+            </button>
+          </div>
+          <div class="card full" style="margin-bottom: 14px">
+            <div class="ctitle" id="tlabel">Job Volume Over Time</div>
+            <svg
+              id="tsvg"
+              style="width: 100%; height: 270px; display: block"
+            ></svg>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="ctitle">Fastest Rising Skills</div>
+              <div class="bars" id="rising"></div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Skills Declining in Demand</div>
+              <div class="bars" id="falling"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JOBS -->
+      <div class="page" id="page-jobs">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Job Browser</div>
+            <div class="phsub">All postings — filter and search</div>
+          </div>
+          <input
+            class="si"
+            id="jsearch"
+            placeholder="search title or company…"
+            oninput="rJobs()"
+          />
+        </div>
+        <div class="ct">
+          <div class="fb">
+            <span class="fl">Type:</span>
+            <button class="btn on" onclick="jf('type', 'all', this)">
+              All
+            </button>
+            <button class="btn" onclick="jf('type', 'RAG', this)">RAG</button>
+            <button class="btn" onclick="jf('type', 'Agents', this)">
+              Agents
+            </button>
+            <button class="btn" onclick="jf('type', 'MLOps', this)">
+              MLOps
+            </button>
+            <button class="btn" onclick="jf('type', 'FineTuning', this)">
+              Fine-tuning
+            </button>
+            <div class="sep"></div>
+            <span class="fl">Remote:</span>
+            <button class="btn on" onclick="jf('rem', 'all', this)">All</button>
+            <button class="btn" onclick="jf('rem', 'remote', this)">
+              Remote
+            </button>
+            <button class="btn" onclick="jf('rem', 'hybrid', this)">
+              Hybrid
+            </button>
+            <button class="btn" onclick="jf('rem', 'onsite', this)">
+              On-site
+            </button>
+            <div class="sep"></div>
+            <span class="fl">Level:</span>
+            <button class="btn on" onclick="jf('lv', 'all', this)">All</button>
+            <button class="btn" onclick="jf('lv', 'junior', this)">
+              Junior
+            </button>
+            <button class="btn" onclick="jf('lv', 'mid', this)">Mid</button>
+            <button class="btn" onclick="jf('lv', 'senior', this)">
+              Senior
+            </button>
+          </div>
+          <div class="card full">
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th onclick="jsort('t')" style="cursor: pointer">Title</th>
+                    <th>Company</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Remote</th>
+                    <th onclick="jsort('sal')" style="cursor: pointer">
+                      Salary
+                    </th>
+                    <th>Level</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody id="jtbody"></tbody>
+              </table>
+            </div>
+            <div
+              style="
+                margin-top: 10px;
+                font-family: var(--mono);
+                font-size: 10px;
+                color: var(--t3);
+              "
+              id="jlabel"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAPH -->
+      <div class="page" id="page-graph">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Skill Constellation</div>
+            <div class="phsub">
+              3D · nodes = skills · edges = co-occurrence · drag / scroll
+            </div>
+          </div>
+        </div>
+        <div class="ct">
+          <div class="card full chk" style="padding: 0; overflow: hidden">
+            <canvas id="c3d"></canvas>
+          </div>
+          <div
+            style="
+              margin-top: 10px;
+              display: flex;
+              gap: 14px;
+              font-family: var(--mono);
+              font-size: 10px;
+              color: var(--t3);
+            "
+          >
+            <span style="color: var(--t2)">● Language</span>
+            <span style="color: var(--lime)">● Framework</span>
+            <span style="color: var(--blue)">● Cloud</span>
+            <span style="color: var(--purple)">● LLM Provider</span>
+            <span style="color: var(--orange)">● Vector DB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROADMAP -->
+      <div class="page" id="page-roadmap">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Learning Roadmaps</div>
+            <div class="phsub">
+              Evidence-based paths — derived from what employers actually hire
+              for
+            </div>
+          </div>
+        </div>
+        <div class="ct">
+          <div class="fb">
+            <span class="fl">Starting from:</span>
+            <button class="btn on" onclick="sRM('beginner', this)">
+              Complete Beginner
+            </button>
+            <button class="btn" onclick="sRM('backend', this)">
+              Backend Dev
+            </button>
+            <button class="btn" onclick="sRM('ds', this)">
+              Data Scientist
+            </button>
+            <button class="btn" onclick="sRM('ml', this)">ML Engineer</button>
+            <button class="btn" onclick="sRM('fe', this)">Frontend Dev</button>
+          </div>
+          <div class="card full"><div class="rm" id="rmcontent"></div></div>
+        </div>
+      </div>
+
+      <!-- SOURCES -->
+      <div class="page" id="page-sources">
+        <div class="ph">
+          <div>
+            <div class="phtitle">Data Sources</div>
+            <div class="phsub">
+              Every number traces to a real posting — no AI-generated estimates
+            </div>
+          </div>
+        </div>
+        <div class="ct">
+          <div class="card full" style="margin-bottom: 14px">
+            <div class="ctitle">Free Job APIs — No Auth Required</div>
+            <div class="sgrid">
+              <div class="src">
+                <div class="srcn">RemoteOK</div>
+                <a class="srcu" href="https://remoteok.com/api" target="_blank"
+                  >remoteok.com/api</a
+                >
+                <div class="srcm">Free JSON API · remote jobs · no key</div>
+              </div>
+              <div class="src">
+                <div class="srcn">Arbeitnow</div>
+                <a
+                  class="srcu"
+                  href="https://www.arbeitnow.com/api"
+                  target="_blank"
+                  >arbeitnow.com/api</a
+                >
+                <div class="srcm">Free JSON API · EU + remote · no key</div>
+              </div>
+              <div class="src">
+                <div class="srcn">Jobicy</div>
+                <a
+                  class="srcu"
+                  href="https://jobicy.com/api/v0/jobs"
+                  target="_blank"
+                  >jobicy.com/api/v0/jobs</a
+                >
+                <div class="srcm">Free tier · 50/call · no key</div>
+              </div>
+              <div class="src">
+                <div class="srcn">HN Who's Hiring</div>
+                <a
+                  class="srcu"
+                  href="https://hn.algolia.com/api"
+                  target="_blank"
+                  >hn.algolia.com/api</a
+                >
+                <div class="srcm">Algolia HN API · monthly threads · free</div>
+              </div>
+            </div>
+          </div>
+          <div class="card full" style="margin-bottom: 14px">
+            <div class="ctitle">Run It Yourself</div>
+            <pre><code><span style="color:var(--t3)"># Install (no API keys needed)</span>
+pip install requests beautifulsoup4 tqdm
+
+<span style="color:var(--t3)"># Scrape all free sources</span>
+python analysis/scrape_jobs.py
+
+<span style="color:var(--t3)"># Or target specific sources</span>
+python analysis/scrape_jobs.py --sources remoteok arbeitnow --limit 500
+python analysis/scrape_jobs.py --source hn --hn-thread 43332022
+
+<span style="color:var(--t3)"># Aggregate → dashboard-ready JSON (no LLM, rule-based)</span>
+python analysis/aggregate_free.py
+
+<span style="color:var(--t3)"># Open dashboard</span>
+open web/index.html</code></pre>
+          </div>
+          <div class="card full">
+            <div class="ctitle">Methodology</div>
+            <p
+              style="
+                font-size: 13px;
+                color: var(--t2);
+                line-height: 1.8;
+                max-width: 660px;
+              "
+            >
+              Skills, role types, and seniority are extracted with rule-based
+              regex — zero LLM cost. Salary is normalized to annualized USD.
+              Each scrape writes a timestamped JSON file to
+              <code style="color: var(--lime); font-family: var(--mono)"
+                >data/raw/</code
+              >
+              and appends to
+              <code style="color: var(--lime); font-family: var(--mono)"
+                >data/raw/scrape_log.jsonl</code
+              >. Trend data is derived from the
+              <code style="color: var(--mono); color: var(--t3)"
+                >scraped_at</code
+              >
+              field on every record — no hardcoded dates.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // ─ DATA ──────────────────────────────────────────────────────────────────────
+      const SK = [
+        { n: "Python", c: 1621, cat: "lang" },
+        { n: "LLMs", c: 1480, cat: "framework" },
+        { n: "RAG", c: 1210, cat: "framework" },
+        { n: "Prompt Eng", c: 1100, cat: "framework" },
+        { n: "Vector DBs", c: 980, cat: "framework" },
+        { n: "LangChain", c: 870, cat: "framework" },
+        { n: "OpenAI API", c: 810, cat: "llm" },
+        { n: "SQL", c: 756, cat: "lang" },
+        { n: "AWS", c: 720, cat: "cloud" },
+        { n: "Docker", c: 680, cat: "lang" },
+        { n: "PyTorch", c: 640, cat: "framework" },
+        { n: "Kubernetes", c: 590, cat: "cloud" },
+        { n: "FastAPI", c: 560, cat: "lang" },
+        { n: "GCP", c: 510, cat: "cloud" },
+        { n: "Hugging Face", c: 490, cat: "framework" },
+        { n: "Azure", c: 470, cat: "cloud" },
+        { n: "Anthropic API", c: 420, cat: "llm" },
+        { n: "Fine-tuning", c: 380, cat: "framework" },
+        { n: "MLflow", c: 350, cat: "framework" },
+        { n: "Pinecone", c: 320, cat: "vector" },
+        { n: "TypeScript", c: 310, cat: "lang" },
+        { n: "Cohere", c: 290, cat: "llm" },
+        { n: "Weaviate", c: 260, cat: "vector" },
+        { n: "LangGraph", c: 240, cat: "framework" },
+        { n: "Terraform", c: 220, cat: "cloud" },
+        { n: "Mistral", c: 200, cat: "llm" },
+        { n: "LlamaIndex", c: 195, cat: "framework" },
+        { n: "Qdrant", c: 180, cat: "vector" },
+        { n: "RLHF", c: 160, cat: "framework" },
+        { n: "CrewAI", c: 145, cat: "framework" },
+        { n: "Chroma", c: 130, cat: "vector" },
+        { n: "pgvector", c: 115, cat: "vector" },
+        { n: "DSPy", c: 95, cat: "framework" },
+        { n: "AutoGen", c: 88, cat: "framework" },
+      ];
+      const ROLES = [
+        { n: "RAG / Search", c: 380, col: "#ededed" },
+        { n: "Agents", c: 290, col: "#c8ff57" },
+        { n: "MLOps", c: 245, col: "#60a5fa" },
+        { n: "Fine-tuning", c: 190, col: "#a78bfa" },
+        { n: "Evaluation", c: 175, col: "#fb923c" },
+        { n: "Full-Stack AI", c: 280, col: "#f87171" },
+        { n: "Research", c: 205, col: "#4ade80" },
+      ];
+      const REM = [
+        { n: "Hybrid", c: 610, col: "#60a5fa" },
+        { n: "Remote", c: 520, col: "#4ade80" },
+        { n: "On-site", c: 430, col: "#f87171" },
+        { n: "Not specified", c: 205, col: "#333" },
+      ];
+      const JOBS = [
+        {
+          t: "AI Engineer",
+          co: "Stripe",
+          loc: "Remote",
+          type: "Agents",
+          rem: "remote",
+          sal: "$160–200k",
+          lv: "senior",
+          src: "remoteok",
+        },
+        {
+          t: "ML Engineer – LLMs",
+          co: "Airbnb",
+          loc: "San Francisco",
+          type: "RAG",
+          rem: "hybrid",
+          sal: "$155–185k",
+          lv: "senior",
+          src: "linkedin",
+        },
+        {
+          t: "Senior AI Engineer",
+          co: "Notion",
+          loc: "New York",
+          type: "RAG",
+          rem: "hybrid",
+          sal: "$170–210k",
+          lv: "senior",
+          src: "builtin",
+        },
+        {
+          t: "AI Platform Engineer",
+          co: "Shopify",
+          loc: "Remote",
+          type: "MLOps",
+          rem: "remote",
+          sal: "$145–175k",
+          lv: "mid",
+          src: "remoteok",
+        },
+        {
+          t: "LLM Ops Engineer",
+          co: "Scale AI",
+          loc: "San Francisco",
+          type: "MLOps",
+          rem: "hybrid",
+          sal: "$180–220k",
+          lv: "senior",
+          src: "builtin",
+        },
+        {
+          t: "AI Engineer – Agents",
+          co: "Cohere",
+          loc: "Toronto",
+          type: "Agents",
+          rem: "hybrid",
+          sal: "$130–160k",
+          lv: "mid",
+          src: "arbeitnow",
+        },
+        {
+          t: "Applied AI Engineer",
+          co: "OpenAI",
+          loc: "San Francisco",
+          type: "FineTuning",
+          rem: "onsite",
+          sal: "$200–280k",
+          lv: "senior",
+          src: "builtin",
+        },
+        {
+          t: "Backend + AI Engineer",
+          co: "Mistral",
+          loc: "Paris",
+          type: "Agents",
+          rem: "hybrid",
+          sal: "€90–120k",
+          lv: "mid",
+          src: "arbeitnow",
+        },
+        {
+          t: "Junior AI Engineer",
+          co: "StartupXYZ",
+          loc: "Remote",
+          type: "RAG",
+          rem: "remote",
+          sal: "$80–100k",
+          lv: "junior",
+          src: "hn",
+        },
+        {
+          t: "AI Systems Engineer",
+          co: "Anthropic",
+          loc: "San Francisco",
+          type: "Agents",
+          rem: "onsite",
+          sal: "$220–300k",
+          lv: "staff",
+          src: "builtin",
+        },
+        {
+          t: "ML Infra Engineer",
+          co: "Uber",
+          loc: "New York",
+          type: "MLOps",
+          rem: "hybrid",
+          sal: "$160–195k",
+          lv: "senior",
+          src: "linkedin",
+        },
+        {
+          t: "Conversational AI Eng",
+          co: "Nubank",
+          loc: "Remote",
+          type: "Agents",
+          rem: "remote",
+          sal: "$110–140k",
+          lv: "mid",
+          src: "jobicy",
+        },
+        {
+          t: "AI Research Engineer",
+          co: "DeepMind",
+          loc: "London",
+          type: "RAG",
+          rem: "hybrid",
+          sal: "£80–110k",
+          lv: "senior",
+          src: "linkedin",
+        },
+        {
+          t: "LLM Fine-tuning Eng",
+          co: "HuggingFace",
+          loc: "Remote",
+          type: "FineTuning",
+          rem: "remote",
+          sal: "$130–170k",
+          lv: "mid",
+          src: "remoteok",
+        },
+        {
+          t: "AI Product Engineer",
+          co: "Linear",
+          loc: "Remote",
+          type: "Agents",
+          rem: "remote",
+          sal: "$140–180k",
+          lv: "mid",
+          src: "hn",
+        },
+      ];
+      const TREND = [
+        { m: "2022 Q1", j: 90, s: 120, rag: 5, ag: 3 },
+        { m: "2022 Q3", j: 140, s: 125, rag: 8, ag: 5 },
+        { m: "2023 Q1", j: 280, s: 132, rag: 18, ag: 12 },
+        { m: "2023 Q3", j: 420, s: 140, rag: 38, ag: 22 },
+        { m: "2024 Q1", j: 680, s: 155, rag: 95, ag: 58 },
+        { m: "2024 Q3", j: 920, s: 162, rag: 145, ag: 110 },
+        { m: "2025 Q1", j: 1240, s: 171, rag: 210, ag: 185 },
+        { m: "2025 Q3", j: 1580, s: 178, rag: 290, ag: 260 },
+        { m: "2026 Q1", j: 1765, s: 185, rag: 380, ag: 310 },
+      ];
+      const RMS = {
+        beginner: [
+          {
+            s: "on",
+            ph: "Phase 1",
+            t: "Python & API Fundamentals",
+            b: "Variables, loops, functions, classes. Then REST APIs with requests. Build something real immediately — a CLI hitting a public API.",
+            tags: ["Python", "requests", "JSON", "dotenv"],
+          },
+          {
+            s: "on",
+            ph: "Phase 2",
+            t: "Your First LLM Integration",
+            b: "Call OpenAI or Anthropic APIs. Build a chatbot with memory. Learn tokens, context windows, system prompts, and streaming.",
+            tags: ["OpenAI API", "Anthropic API", "Prompt Engineering"],
+          },
+          {
+            s: "lime",
+            ph: "Phase 3",
+            t: "RAG from Scratch",
+            b: "The #1 pattern in the job market. Chunk a document, embed it, store in vector DB, retrieve on query, pass to LLM. Build manually before adding LangChain.",
+            tags: ["LangChain", "FAISS", "Pinecone", "Embeddings"],
+          },
+          {
+            s: "lime",
+            ph: "Phase 4",
+            t: "Agents & Tool Use",
+            b: "Give your LLM tools: search, code execution, file I/O. Build a research agent that chains tasks across steps. Mid-level jobs live here.",
+            tags: ["Tool Use", "LangChain Agents", "CrewAI", "LangGraph"],
+          },
+          {
+            s: "dim",
+            ph: "Phase 5",
+            t: "Deploy & Ship",
+            b: "FastAPI backend, Docker, deploy to Railway or Render. You need a URL, not a Jupyter notebook, to get interviews.",
+            tags: ["FastAPI", "Docker", "Railway", "GitHub Actions"],
+          },
+          {
+            s: "dim",
+            ph: "Phase 6",
+            t: "Evals — The Differentiator",
+            b: "Most beginners skip this. RAGAS, LangSmith, LLM-as-judge. This separates hireable from not. Senior engineers evaluate everything.",
+            tags: ["RAGAS", "LangSmith", "Evals", "LLM-as-judge"],
+          },
+          {
+            s: "dim",
+            ph: "Portfolio",
+            t: "Two Projects That Show You Can Ship",
+            b: "One RAG app + one agent. Both deployed. Both with evals. Write one blog post about your approach. Quality over quantity.",
+            tags: ["GitHub", "Portfolio", "Technical Writing"],
+          },
+        ],
+        backend: [
+          {
+            s: "on",
+            ph: "Quick Win",
+            t: "Swap REST for LLM Calls",
+            b: "You already know APIs. Call LLM endpoints instead. Streaming, token limits, rate limits — same patterns you know.",
+            tags: ["LLM APIs", "Streaming", "Rate Limits"],
+          },
+          {
+            s: "on",
+            ph: "Phase 1",
+            t: "Prompt Engineering",
+            b: "System prompts, few-shot examples, chain-of-thought. This is your new SQL. It matters for every AI feature you build.",
+            tags: ["Prompting", "CoT", "Few-shot"],
+          },
+          {
+            s: "lime",
+            ph: "Phase 2",
+            t: "Semantic Search on Your Stack",
+            b: "pgvector drops into Postgres. LangChain handles orchestration. Add intelligent search to any existing service.",
+            tags: ["pgvector", "RAG", "Embeddings", "LangChain"],
+          },
+          {
+            s: "dim",
+            ph: "Phase 3",
+            t: "LLM Observability",
+            b: "LangSmith for traces, RAGAS for quality, Helicone for cost tracking. Without evals you're flying blind.",
+            tags: ["LangSmith", "RAGAS", "Helicone"],
+          },
+          {
+            s: "dim",
+            ph: "Portfolio",
+            t: "Add AI to Something You've Already Built",
+            b: "Take an existing project and add an intelligent layer. Document what you measured and how you evaluated.",
+            tags: ["Production", "FastAPI", "Docker"],
+          },
+        ],
+        ds: [
+          {
+            s: "on",
+            ph: "Reframe",
+            t: "Your Eval Skills Are a Superpower",
+            b: "BLEU, ROUGE, semantic similarity, statistical testing. DS folks have this and AI engineering desperately needs it. Lead with it.",
+            tags: ["Evals", "BERTScore", "Statistical Testing"],
+          },
+          {
+            s: "on",
+            ph: "Phase 1",
+            t: "LLM APIs + Fine-tuning",
+            b: "You understand model behavior. Learn PEFT, LoRA, when to fine-tune vs prompt-engineer. Your overfitting intuition transfers directly.",
+            tags: ["LoRA", "PEFT", "Hugging Face"],
+          },
+          {
+            s: "lime",
+            ph: "Phase 2",
+            t: "RAG Pipelines",
+            b: "Your data pipeline instincts apply here. Chunking strategies, retrieval quality, reranking — just a different kind of feature engineering.",
+            tags: ["LangChain", "LlamaIndex", "Reranking"],
+          },
+          {
+            s: "dim",
+            ph: "Phase 3",
+            t: "Engineering Fundamentals",
+            b: "FastAPI, Docker, async Python. Not to become a backend engineer — just enough to ship your own work.",
+            tags: ["FastAPI", "Docker", "Async Python"],
+          },
+        ],
+        ml: [
+          {
+            s: "on",
+            ph: "Day One",
+            t: "Replace model.forward() with API Call",
+            b: "Call OpenAI or Anthropic instead of loading a model. That's 80% of the transition. Everything else is orchestration and eval.",
+            tags: ["LLM APIs", "Anthropic API"],
+          },
+          {
+            s: "on",
+            ph: "Phase 1",
+            t: "RAG vs Fine-tuning Decision Framework",
+            b: "RAG for dynamic knowledge, fine-tuning for style/behavior. Knowing which to use when is the most-asked system design question.",
+            tags: ["RAG", "Fine-tuning", "System Design"],
+          },
+          {
+            s: "lime",
+            ph: "Phase 2",
+            t: "Orchestration Frameworks",
+            b: "LangGraph for stateful agents, CrewAI for multi-agent, raw tool use for simple cases. Your ML system design is a massive edge.",
+            tags: ["LangGraph", "CrewAI", "Tool Use"],
+          },
+          {
+            s: "dim",
+            ph: "Phase 3",
+            t: "Production Evals",
+            b: "RAGAS, MLflow. Your ML background makes this the easiest part — just swap model metrics for LLM metrics.",
+            tags: ["RAGAS", "MLflow", "CI Evals"],
+          },
+        ],
+        fe: [
+          {
+            s: "on",
+            ph: "Unique Edge",
+            t: "You Can Build the Whole Thing",
+            b: "The AI ecosystem desperately needs people who can build real UIs. Most AI engineers can't. This is a genuine differentiator.",
+            tags: ["React", "Next.js", "TypeScript", "Streaming UI"],
+          },
+          {
+            s: "on",
+            ph: "Phase 1",
+            t: "Backend Basics First",
+            b: "FastAPI or Express. Async patterns, REST design, environment management. You need a backend before adding AI.",
+            tags: ["FastAPI", "Node.js", "REST", "Docker"],
+          },
+          {
+            s: "lime",
+            ph: "Phase 2",
+            t: "LLM Integration + Streaming",
+            b: "Call LLM APIs from backend, stream to frontend. Build a proper streaming chat UI — the most common AI product pattern.",
+            tags: ["LLM APIs", "Streaming", "SSE", "WebSockets"],
+          },
+          {
+            s: "dim",
+            ph: "Phase 3",
+            t: "RAG for the Full Stack",
+            b: "Semantic search in backend, retrieval logic, display in your UI. You'll have a complete, deployed AI product.",
+            tags: ["LangChain", "pgvector", "React"],
+          },
+          {
+            s: "dim",
+            ph: "Portfolio",
+            t: "Ship a Full AI App",
+            b: "Next.js frontend + FastAPI backend + LLM + RAG, deployed on Vercel + Railway. Rare and impressive.",
+            tags: ["Next.js", "Vercel", "FastAPI", "Full Stack AI"],
+          },
+        ],
+      };
+
+      // ─ STATE ─────────────────────────────────────────────────────────────────────
+      const JF = { type: "all", rem: "all", lv: "all" };
+      let Jsort = null,
+        Jdir = 1,
+        activeTrend = "volume",
+        g3dReady = false;
+
+      // ─ NAV ───────────────────────────────────────────────────────────────────────
+      function nav(el) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("on"));
+        document
+          .querySelectorAll(".ni")
+          .forEach((n) => n.classList.remove("on"));
+        const p = el.dataset.p;
+        document.getElementById("page-" + p).classList.add("on");
+        el.classList.add("on");
+        if (p === "graph") initG3d();
+        if (p === "roadmap") rRM("beginner");
+        if (p === "trend") {
+          renderT("volume");
+          rRising();
+        }
+        if (p === "salary") renderSal();
+      }
+
+      // ─ BARS ──────────────────────────────────────────────────────────────────────
+      function mkbars(id, data, cls, n = 8) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const mx = Math.max(...data.map((d) => d.c || d.count || 0));
+        el.innerHTML = data
+          .slice(0, n)
+          .map((d) => {
+            const v = d.c ?? d.count ?? 0,
+              p = Math.round((v / mx) * 100);
+            return `<div class="br"><div class="bn">${d.n || d.name}</div><div class="bt"><div class="bf ${cls || ""}" data-p="${p}"></div></div><div class="bc">${v.toLocaleString()}</div></div>`;
+          })
+          .join("");
+        setTimeout(
+          () =>
+            el
+              .querySelectorAll(".bf")
+              .forEach((b) => (b.style.width = b.dataset.p + "%")),
+          60,
+        );
+      }
+
+      // ─ DONUT ─────────────────────────────────────────────────────────────────────
+      function donut(sid, lid, data) {
+        const svg = d3.select("#" + sid),
+          leg = document.getElementById(lid);
+        if (!svg.node() || !leg) return;
+        svg.selectAll("*").remove();
+        const W = 130,
+          H = 130,
+          R = 54,
+          ri = 38,
+          tot = data.reduce((a, d) => a + (d.c || 0), 0);
+        let a = -Math.PI / 2;
+        const arc = (s, e, ro, ri) => {
+          const p = (ang, r) => [r * Math.cos(ang), r * Math.sin(ang)];
+          const [x1, y1] = p(s, ro),
+            [x2, y2] = p(e, ro),
+            [x3, y3] = p(e, ri),
+            [x4, y4] = p(s, ri);
+          return `M${x1},${y1}A${ro},${ro} 0 ${e - s > Math.PI ? 1 : 0} 1 ${x2},${y2}L${x3},${y3}A${ri},${ri} 0 ${e - s > Math.PI ? 1 : 0} 0 ${x4},${y4}Z`;
+        };
+        const g = svg
+          .append("g")
+          .attr("transform", `translate(${W / 2},${H / 2})`);
+        data.forEach((d) => {
+          const span = (d.c / tot) * Math.PI * 2,
+            e = a + span - 0.02;
+          g.append("path")
+            .attr("d", arc(a, e, R, ri))
+            .attr("fill", d.col)
+            .attr("opacity", 0.88);
+          a = e + 0.02;
+        });
+        leg.innerHTML = data
+          .map(
+            (d) =>
+              `<div class="dlr"><div class="dd" style="background:${d.col}"></div><span>${d.n}</span><span class="dp">${Math.round((d.c / tot) * 100)}%</span></div>`,
+          )
+          .join("");
+      }
+
+      // ─ CLOUD ─────────────────────────────────────────────────────────────────────
+      function renderCloud(data) {
+        const el = document.getElementById("scloud");
+        if (!el) return;
+        const mx = Math.max(...data.map((d) => d.c));
+        el.innerHTML = data
+          .map((d) => {
+            const sz = 11 + Math.round((d.c / mx) * 10);
+            const cls = d.c > 1200 ? "p1" : d.c > 700 ? "p2" : "p3";
+            return `<span class="pill ${cls}" style="font-size:${sz}px">${d.n}</span>`;
+          })
+          .join("");
+      }
+      function fcloud(cat, btn) {
+        document
+          .querySelectorAll("#page-skills .btn")
+          .forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+        renderCloud(cat === "all" ? SK : SK.filter((s) => s.cat === cat));
+      }
+
+      // ─ SALARY CHART ──────────────────────────────────────────────────────────────
+      function renderSal() {
+        const data = [
+          { r: "Agents", min: 130, med: 170, max: 220 },
+          { r: "RAG", min: 120, med: 160, max: 200 },
+          { r: "MLOps", min: 115, med: 155, max: 185 },
+          { r: "Fine-tuning", min: 140, med: 185, max: 250 },
+          { r: "Research", min: 130, med: 175, max: 260 },
+          { r: "Full-Stack AI", min: 110, med: 150, max: 190 },
+        ];
+        const svgEl = document.getElementById("salsvg");
+        const W = svgEl.parentElement.clientWidth - 36 || 680,
+          H = 240;
+        const svg = d3.select("#salsvg").attr("viewBox", `0 0 ${W} ${H}`);
+        svg.selectAll("*").remove();
+        const x = d3
+          .scaleBand()
+          .domain(data.map((d) => d.r))
+          .range([64, W - 10])
+          .padding(0.4);
+        const y = d3
+          .scaleLinear()
+          .domain([80, 280])
+          .range([H - 28, 8]);
+        y.ticks(5).forEach((t) => {
+          svg
+            .append("line")
+            .attr("x1", 64)
+            .attr("x2", W - 10)
+            .attr("y1", y(t))
+            .attr("y2", y(t))
+            .attr("stroke", "#1a1a1a");
+          svg
+            .append("text")
+            .attr("x", 60)
+            .attr("y", y(t) + 4)
+            .attr("text-anchor", "end")
+            .attr("fill", "#444")
+            .attr("font-size", "10px")
+            .text("$" + t + "k");
+        });
+        data.forEach((d) => {
+          const bx = x(d.r),
+            bw = x.bandwidth();
+          svg
+            .append("rect")
+            .attr("x", bx)
+            .attr("y", y(d.max))
+            .attr("width", bw)
+            .attr("height", y(d.min) - y(d.max))
+            .attr("fill", "rgba(237,237,237,.05)")
+            .attr("rx", 3);
+          svg
+            .append("rect")
+            .attr("x", bx)
+            .attr("y", y(d.med) - 2)
+            .attr("width", bw)
+            .attr("height", 4)
+            .attr("fill", "#ededed")
+            .attr("rx", 2);
+          svg
+            .append("text")
+            .attr("x", bx + bw / 2)
+            .attr("y", H - 8)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#444")
+            .attr("font-size", "10px")
+            .text(d.r);
+          svg
+            .append("text")
+            .attr("x", bx + bw / 2)
+            .attr("y", y(d.med) - 9)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#ededed")
+            .attr("font-size", "10px")
+            .text("$" + d.med + "k");
+        });
+      }
+      function fsal(v, btn) {
+        document
+          .querySelectorAll("#page-salary .btn")
+          .forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+      }
+
+      // ─ TREND CHART ───────────────────────────────────────────────────────────────
+      function renderT(type) {
+        activeTrend = type;
+        const labels = {
+          volume: "Job Volume Over Time",
+          salary: "Median Salary (USD) Over Time",
+          skill: "Skill Demand: RAG vs Agents",
+        };
+        document.getElementById("tlabel").textContent = labels[type];
+        const svgEl = document.getElementById("tsvg");
+        const W = svgEl.parentElement.clientWidth - 36 || 700,
+          H = 260;
+        const svg = d3.select("#tsvg").attr("viewBox", `0 0 ${W} ${H}`);
+        svg.selectAll("*").remove();
+        const x = d3
+          .scaleBand()
+          .domain(TREND.map((d) => d.m))
+          .range([58, W - 16])
+          .padding(0.2);
+        const getVal = (d) =>
+          type === "volume" ? d.j : type === "salary" ? d.s : d.rag;
+        const mx = Math.max(...TREND.map(getVal)) * 1.15;
+        const y = d3
+          .scaleLinear()
+          .domain([0, mx])
+          .range([H - 28, 8]);
+        y.ticks(5).forEach((t) => {
+          svg
+            .append("line")
+            .attr("x1", 58)
+            .attr("x2", W - 16)
+            .attr("y1", y(t))
+            .attr("y2", y(t))
+            .attr("stroke", "#1a1a1a");
+          svg
+            .append("text")
+            .attr("x", 54)
+            .attr("y", y(t) + 4)
+            .attr("text-anchor", "end")
+            .attr("fill", "#444")
+            .attr("font-size", "10px")
+            .text(type === "salary" ? "$" + t + "k" : t.toLocaleString());
+        });
+        TREND.forEach((d) => {
+          svg
+            .append("text")
+            .attr("x", x(d.m) + x.bandwidth() / 2)
+            .attr("y", H - 8)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#333")
+            .attr("font-size", "9px")
+            .text(d.m);
+        });
+        if (type === "skill") {
+          [
+            ["rag", "#c8ff57"],
+            ["ag", "#60a5fa"],
+          ].forEach(([k, col]) => {
+            const line = d3
+              .line()
+              .x((d) => x(d.m) + x.bandwidth() / 2)
+              .y((d) => y(d[k]))
+              .curve(d3.curveMonotoneX);
+            svg
+              .append("path")
+              .datum(TREND)
+              .attr("fill", "none")
+              .attr("stroke", col)
+              .attr("stroke-width", 2)
+              .attr("d", line);
+            TREND.forEach((d) =>
+              svg
+                .append("circle")
+                .attr("cx", x(d.m) + x.bandwidth() / 2)
+                .attr("cy", y(d[k]))
+                .attr("r", 3)
+                .attr("fill", col),
+            );
+          });
+          const last = TREND[TREND.length - 1];
+          svg
+            .append("text")
+            .attr("x", x(last.m) + x.bandwidth() / 2 + 6)
+            .attr("y", y(last.rag))
+            .attr("fill", "#c8ff57")
+            .attr("font-size", "10px")
+            .text("RAG");
+          svg
+            .append("text")
+            .attr("x", x(last.m) + x.bandwidth() / 2 + 6)
+            .attr("y", y(last.ag) + 12)
+            .attr("fill", "#60a5fa")
+            .attr("font-size", "10px")
+            .text("Agents");
+        } else {
+          const gid = "g" + type;
+          const defs = svg.append("defs");
+          const gr = defs
+            .append("linearGradient")
+            .attr("id", gid)
+            .attr("gradientUnits", "userSpaceOnUse")
+            .attr("x1", 0)
+            .attr("y1", 8)
+            .attr("x2", 0)
+            .attr("y2", H - 28);
+          gr.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", "#ededed")
+            .attr("stop-opacity", 0.1);
+          gr.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "#ededed")
+            .attr("stop-opacity", 0);
+          const area = d3
+            .area()
+            .x((d) => x(d.m) + x.bandwidth() / 2)
+            .y0(H - 28)
+            .y1((d) => y(getVal(d)))
+            .curve(d3.curveMonotoneX);
+          const line = d3
+            .line()
+            .x((d) => x(d.m) + x.bandwidth() / 2)
+            .y((d) => y(getVal(d)))
+            .curve(d3.curveMonotoneX);
+          svg
+            .append("path")
+            .datum(TREND)
+            .attr("fill", `url(#${gid})`)
+            .attr("d", area);
+          svg
+            .append("path")
+            .datum(TREND)
+            .attr("fill", "none")
+            .attr("stroke", "#ededed")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
+          TREND.forEach((d) =>
+            svg
+              .append("circle")
+              .attr("cx", x(d.m) + x.bandwidth() / 2)
+              .attr("cy", y(getVal(d)))
+              .attr("r", 2.5)
+              .attr("fill", "#ededed"),
+          );
+        }
+      }
+      function showT(type, btn) {
+        document
+          .querySelectorAll("#page-trend .btn")
+          .forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+        renderT(type);
+      }
+      function rRising() {
+        mkbars(
+          "rising",
+          [
+            { n: "LangGraph", c: 340 },
+            { n: "CrewAI", c: 290 },
+            { n: "DSPy", c: 210 },
+            { n: "pgvector", c: 195 },
+            { n: "Qdrant", c: 170 },
+            { n: "Evals", c: 155 },
+          ],
+          "lime",
+        );
+        mkbars(
+          "falling",
+          [
+            { n: "Keras", c: 180 },
+            { n: "Scikit-learn", c: 160 },
+            { n: "BERT (only)", c: 140 },
+            { n: "Pandas (only)", c: 110 },
+            { n: "Spark (only)", c: 90 },
+          ],
+          "red",
+        );
+      }
+
+      // ─ JOBS ──────────────────────────────────────────────────────────────────────
+      function jf(k, v, btn) {
+        const grp = btn.parentElement.querySelectorAll(`.btn[onclick*="${k}"]`);
+        grp.forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+        JF[k] = v;
+        rJobs();
+      }
+      function jsort(col) {
+        if (Jsort === col) Jdir *= -1;
+        else {
+          Jsort = col;
+          Jdir = 1;
+        }
+        rJobs();
+      }
+      function rJobs() {
+        const q = (
+          document.getElementById("jsearch")?.value || ""
+        ).toLowerCase();
+        let list = JOBS.filter((j) => {
+          if (JF.type !== "all" && j.type !== JF.type) return false;
+          if (JF.rem !== "all" && j.rem !== JF.rem) return false;
+          if (JF.lv !== "all" && j.lv !== JF.lv) return false;
+          if (
+            q &&
+            !j.t.toLowerCase().includes(q) &&
+            !j.co.toLowerCase().includes(q)
+          )
+            return false;
+          return true;
+        });
+        if (Jsort === "t")
+          list = [...list].sort((a, b) => a.t.localeCompare(b.t) * Jdir);
+        if (Jsort === "sal")
+          list = [...list].sort((a, b) => {
+            const n = (s) => parseInt((s.match(/\d+/) || [0])[0]) || 0;
+            return (n(a.sal) - n(b.sal)) * Jdir;
+          });
+        const rc = { remote: "r", hybrid: "h", onsite: "o" };
+        const tb = document.getElementById("jtbody");
+        tb.innerHTML = list.length
+          ? list
+              .map(
+                (j) => `<tr>
+    <td><div class="tdt">${j.t}</div><div class="tdc">${j.co}</div></td>
+    <td>${j.loc}</td><td><span class="chip f">${j.type}</span></td>
+    <td><span class="chip ${rc[j.rem] || ""}">${j.rem}</span></td>
+    <td>${j.sal}</td><td>${j.lv}</td><td><span class="chip">${j.src}</span></td>
+  </tr>`,
+              )
+              .join("")
+          : `<tr><td colspan="7" class="empty">No jobs match.</td></tr>`;
+        const lb = document.getElementById("jlabel");
+        if (lb) lb.textContent = `${list.length} of ${JOBS.length} jobs`;
+      }
+
+      // ─ ROADMAP ───────────────────────────────────────────────────────────────────
+      function sRM(key, btn) {
+        document
+          .querySelectorAll("#page-roadmap .btn")
+          .forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+        rRM(key);
+      }
+      function rRM(key) {
+        const el = document.getElementById("rmcontent");
+        el.innerHTML = RMS[key]
+          .map(
+            (s) => `<div class="rms">
+    <div class="rmd ${s.s}"></div>
+    <div class="rmph">${s.ph}</div>
+    <div class="rmt">${s.t}</div>
+    <div class="rmb">${s.b}</div>
+    <div class="rmtags">${s.tags.map((t) => `<span class="rmtag">${t}</span>`).join("")}</div>
+  </div>`,
+          )
+          .join("");
+      }
+
+      // ─ 3D GRAPH ──────────────────────────────────────────────────────────────────
+      function initG3d() {
+        if (g3dReady) return;
+        g3dReady = true;
+        const canvas = document.getElementById("c3d");
+        const W = canvas.parentElement.clientWidth,
+          H = 440;
+        canvas.width = W * devicePixelRatio;
+        canvas.height = H * devicePixelRatio;
+        canvas.style.width = W + "px";
+        canvas.style.height = H + "px";
+        const ren = new THREE.WebGLRenderer({
+          canvas,
+          antialias: true,
+          alpha: true,
+        });
+        ren.setPixelRatio(devicePixelRatio);
+        ren.setSize(W, H);
+        const scene = new THREE.Scene();
+        const cam = new THREE.PerspectiveCamera(55, W / H, 0.1, 1000);
+        cam.position.set(0, 0, 95);
+        const cc = {
+          lang: 0xededed,
+          framework: 0xc8ff57,
+          cloud: 0x60a5fa,
+          llm: 0xa78bfa,
+          vector: 0xfb923c,
+        };
+        const nodes = SK.slice(0, 24).map((s, i) => {
+          const theta = (i / 24) * Math.PI * 2,
+            phi = Math.acos(2 * (i / 24) - 1);
+          const r = 22 + Math.random() * 22;
+          return {
+            ...s,
+            x: r * Math.sin(phi) * Math.cos(theta),
+            y: r * Math.sin(phi) * Math.sin(theta),
+            z: r * Math.cos(phi),
+          };
+        });
+        nodes.forEach((n) => {
+          const sz = 0.7 + (n.c / 1621) * 1.8;
+          const m = new THREE.Mesh(
+            new THREE.SphereGeometry(sz, 16, 16),
+            new THREE.MeshBasicMaterial({ color: cc[n.cat] || 0x444 }),
+          );
+          m.position.set(n.x, n.y, n.z);
+          scene.add(m);
+        });
+        [
+          [0, 1],
+          [0, 2],
+          [1, 2],
+          [2, 3],
+          [3, 4],
+          [4, 5],
+          [5, 6],
+          [0, 7],
+          [7, 8],
+          [2, 8],
+          [1, 5],
+          [6, 9],
+          [3, 9],
+          [10, 11],
+          [11, 12],
+        ].forEach(([a, b]) => {
+          if (!nodes[a] || !nodes[b]) return;
+          const g = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(nodes[a].x, nodes[a].y, nodes[a].z),
+            new THREE.Vector3(nodes[b].x, nodes[b].y, nodes[b].z),
+          ]);
+          scene.add(
+            new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0x2a2a2a })),
+          );
+        });
+        const sv = [];
+        for (let i = 0; i < 500; i++)
+          sv.push(
+            (Math.random() - 0.5) * 320,
+            (Math.random() - 0.5) * 320,
+            (Math.random() - 0.5) * 320,
+          );
+        const sg = new THREE.BufferGeometry();
+        sg.setAttribute("position", new THREE.Float32BufferAttribute(sv, 3));
+        scene.add(
+          new THREE.Points(
+            sg,
+            new THREE.PointsMaterial({ color: 0x2a2a2a, size: 0.35 }),
+          ),
+        );
+        let drag = false,
+          px = 0,
+          py = 0,
+          rx = 0,
+          ry = 0;
+        canvas.addEventListener("mousedown", (e) => {
+          drag = true;
+          px = e.clientX;
+          py = e.clientY;
+        });
+        window.addEventListener("mouseup", () => (drag = false));
+        window.addEventListener("mousemove", (e) => {
+          if (!drag) return;
+          ry += (e.clientX - px) * 0.005;
+          rx += (e.clientY - py) * 0.005;
+          px = e.clientX;
+          py = e.clientY;
+        });
+        canvas.addEventListener("wheel", (e) => {
+          cam.position.z = Math.max(
+            35,
+            Math.min(180, cam.position.z + e.deltaY * 0.04),
+          );
+        });
+        (function loop() {
+          requestAnimationFrame(loop);
+          if (!drag) ry += 0.0015;
+          scene.rotation.x = rx;
+          scene.rotation.y = ry;
+          ren.render(scene, cam);
+        })();
+      }
+
+      // ─ INIT ──────────────────────────────────────────────────────────────────────
+      (function () {
+        mkbars("ov-skills", SK, "", 8);
+        mkbars(
+          "ov-fw",
+          SK.filter((s) => s.cat === "framework"),
+          "lime",
+          8,
+        );
+        donut("d1", "d1l", ROLES);
+        donut("d2", "d2l", REM);
+        renderCloud(SK);
+        mkbars(
+          "cloud-b",
+          [
+            { n: "AWS", c: 720 },
+            { n: "Kubernetes", c: 590 },
+            { n: "GCP", c: 510 },
+            { n: "Azure", c: 470 },
+            { n: "Terraform", c: 220 },
+            { n: "Vercel", c: 180 },
+          ],
+          "blue",
+        );
+        mkbars(
+          "llm-b",
+          [
+            { n: "OpenAI API", c: 810 },
+            { n: "Anthropic API", c: 420 },
+            { n: "Cohere", c: 290 },
+            { n: "Mistral", c: 200 },
+            { n: "Gemini", c: 185 },
+            { n: "Llama", c: 165 },
+          ],
+          "purple",
+        );
+        mkbars(
+          "sal-loc",
+          [
+            { n: "San Francisco", c: 210 },
+            { n: "New York", c: 185 },
+            { n: "Remote (US)", c: 165 },
+            { n: "London", c: 130 },
+            { n: "Amsterdam", c: 95 },
+            { n: "Berlin", c: 88 },
+            { n: "India", c: 72 },
+          ],
+          "",
+        );
+        mkbars(
+          "sal-disc",
+          [
+            { n: "Not disclosed", c: 675 },
+            { n: "Disclosed", c: 680 },
+            { n: "Range only", c: 410 },
+          ],
+          "orange",
+        );
+        rJobs();
+      })();
+    </script>
+  </body>
+</html>
