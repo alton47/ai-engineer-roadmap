@@ -22,7 +22,7 @@ venv/
 env/
 
 # Data & Logs
-# data/raw/*
+data/raw/*
 data/tmp/
 *.log
 npm-debug.log*
