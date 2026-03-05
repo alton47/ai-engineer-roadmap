@@ -1,35 +1,32 @@
 <div align="center">
 
-```
-  ╔═══════════════════════════════════╗
-  ║   AI ENGINEER ROADMAP  🛰         ║
-  ║   data-driven · open · free       ║
-  ╚═══════════════════════════════════╝
-```
+# AI Engineer Roadmap 🛰
 
-**Real job market intelligence for AI engineers.**  
-Built from scraped postings, zero API keys required, fully open source.
+**Data-driven intelligence on the AI engineering job market.**  
+Built from scraped job postings. Zero API costs. Fully open source.
 
-[![Jobs Scraped](https://img.shields.io/badge/jobs_scraped-1%2C765%2B-c8ff57?style=flat-square&labelColor=111)](data/aggregated/)
-[![Sources](https://img.shields.io/badge/free_sources-4-60a5fa?style=flat-square&labelColor=111)](scraper/)
-[![Deploy on Vercel](https://img.shields.io/badge/deploy-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/ai-engineer-roadmap)
-[![License MIT](https://img.shields.io/badge/license-MIT-4ade80?style=flat-square&labelColor=111)](LICENSE)
+[![Scrape sources](https://img.shields.io/badge/sources-4_free_APIs-b8ff3c?style=flat-square&labelColor=111111)](docs/scraping/)
+[![Stack](https://img.shields.io/badge/stack-Next.js_15_·_Three.js_·_Recharts-3cf0ff?style=flat-square&labelColor=111111)](web/)
+[![Automation](https://img.shields.io/badge/automation-GitHub_Actions-9d7cff?style=flat-square&labelColor=111111)](.github/workflows/)
+[![License](https://img.shields.io/badge/license-MIT-3dffa0?style=flat-square&labelColor=111111)](LICENSE)
 
-[**→ Live Dashboard**](https://ai-engineer-roadmap.vercel.app) · [Scraper Docs](docs/scraping/) · [Add a Source](docs/contributing/) · [Automate It](docs/automation/)
+[**→ Live Dashboard**](https://ai-engineer-roadmap.vercel.app) · [Data Docs](docs/data-interpretation/) · [Add a Source](docs/scraping/) · [Automate](docs/automation/)
+
+---
+
+<img src="https://placehold.co/900x480/030303/b8ff3c?text=Dashboard+Screenshot" alt="Dashboard" width="900" style="border-radius:12px"/>
 
 </div>
 
 ---
 
-## What This Is
+## What This Does
 
-A data pipeline + interactive dashboard that answers:
+Answers three questions that matter when you're job-hunting or upskilling in AI:
 
-- What skills do AI engineering job postings actually require?
-- How have salaries and demand changed over time?
-- What's the fastest path to getting hired from your current background?
-
-Everything here comes from real scraped data. No AI-generated estimates.
+1. **What skills are companies actually requiring right now?** Not what tutorials teach — what's in real job postings.
+2. **What does the market pay?** By seniority level, role type, and location.
+3. **What's the fastest path from your current background?** Phase-based roadmaps derived from the data, not opinion.
 
 ---
 
@@ -38,63 +35,55 @@ Everything here comes from real scraped data. No AI-generated estimates.
 ```
 ai-engineer-roadmap/
 │
-├── scraper/
-│   ├── scrape_jobs.py         ← scrapes 4 free sources, no API keys
-│   ├── aggregate_free.py      ← rule-based extraction → aggregated.json
+├── web/                          ← Next.js 15 dashboard (TypeScript + Tailwind + Three.js)
+│   └── src/
+│       ├── app/
+│       │   ├── page.tsx          ← Main app shell + navigation
+│       │   ├── layout.tsx        ← Root layout, fonts, metadata
+│       │   ├── globals.css       ← Design system, grain, animations
+│       │   └── api/data/         ← API route: reads aggregated.json
+│       ├── components/
+│       │   ├── Sidebar.tsx       ← Animated sidebar with nav + coffee button
+│       │   └── pages/
+│       │       ├── Overview.tsx  ← Main dashboard: stats, charts, distributions
+│       │       ├── Skills.tsx    ← Interactive animated skill cloud + rankings
+│       │       ├── Salary.tsx    ← Salary explorer with role/level filters
+│       │       ├── Trends.tsx    ← Area + line charts: volume, salary, skills over time
+│       │       ├── Jobs.tsx      ← Paginated job browser with multi-filter + search
+│       │       ├── Graph.tsx     ← Three.js 3D skill constellation (drag/hover)
+│       │       ├── Roadmap.tsx   ← 5 learning paths, phase-based, animated timeline
+│       │       └── Sources.tsx   ← Data sources, automation guide, methodology
+│       └── lib/
+│           ├── data.ts           ← Types, helpers, color maps, demo data
+│           └── ui.tsx            ← Shared UI: cards, bars, badges, tooltips
+│
+├── scraper/                      ← Python scraper (populate your own data here)
+│   ├── scrape_jobs.py            ← Scrapes 4 free sources, no API keys
+│   ├── aggregate_free.py         ← Rule-based extraction → aggregated.json
 │   └── requirements.txt
 │
 ├── data/
-│   ├── raw/
-│   │   ├── YYYY-MM-DD_remoteok_Njobs.json    ← timestamped per run
-│   │   ├── YYYY-MM-DD_arbeitnow_Njobs.json
-│   │   └── scrape_log.jsonl                  ← append-only audit trail
+│   ├── raw/                      ← Timestamped JSON per scrape run
+│   │   └── scrape_log.jsonl      ← Append-only audit trail
 │   └── aggregated/
-│       └── aggregated.json                   ← dashboard source of truth
-│
-├── web/                       ← Next.js 15 + Tailwind + Recharts + Three.js
-│   ├── src/
-│   │   ├── app/               ← Next.js App Router
-│   │   ├── components/        ← all UI pages and charts
-│   │   └── lib/data.ts        ← types and data parsing
-│   └── package.json
+│       └── aggregated.json       ← Dashboard data source of truth
 │
 ├── docs/
-│   ├── scraping/              ← how to add new sources
-│   ├── automation/            ← GitHub Actions setup
-│   ├── contributing/          ← contribution guide
-│   └── data-format/           ← schema reference
+│   ├── data-interpretation/      ← How to read the charts and data
+│   ├── scraping/                 ← Adding new free job sources
+│   ├── automation/               ← GitHub Actions weekly scrape setup
+│   └── contributing/             ← Contribution guide
 │
 └── .github/
     └── workflows/
-        └── scrape.yml         ← weekly auto-scrape + commit
+        └── scrape.yml            ← Weekly auto-scrape + commit
 ```
 
 ---
 
 ## Quick Start
 
-### 1 — Scrape data (free, no keys)
-
-```bash
-cd scraper
-pip install -r requirements.txt
-
-# Scrape all sources
-python scrape_jobs.py
-
-# Optional: specific sources or limits
-python scrape_jobs.py --sources remoteok arbeitnow --limit 500
-python scrape_jobs.py --source hn --hn-thread 43332022
-
-# Build aggregated.json for the dashboard
-python aggregate_free.py
-```
-
-**Cost:** $0. **Time:** ~2 minutes for all sources.
-
-Each run writes a timestamped file to `data/raw/` and appends to `scrape_log.jsonl`. Run it weekly and trend charts auto-populate.
-
-### 2 — Run the dashboard locally
+### 1 — Run the web dashboard (demo data included)
 
 ```bash
 cd web
@@ -103,73 +92,98 @@ npm run dev
 # → http://localhost:3000
 ```
 
-The app reads `../data/aggregated/aggregated.json` automatically. Falls back to demo data if the file doesn't exist.
+The dashboard opens with built-in demo data. No setup needed.
 
-### 3 — Deploy to Vercel (1 click)
+### 2 — Scrape real data
+
+```bash
+cd scraper
+pip install -r requirements.txt
+
+# All sources (~2 min, zero cost)
+python scrape_jobs.py
+
+# Build aggregated.json for the dashboard
+python aggregate_free.py
+```
+
+Refresh the dashboard — it now shows your real scraped data.
+
+### 3 — Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/ai-engineer-roadmap)
 
-Set the **Root Directory** to `web/` in Vercel settings. Done.
+Set **Root Directory** to `web/` in Vercel project settings. Done.
 
 ---
 
-## Automate Weekly Scraping
+## Weekly Automation (Free)
 
-Push `.github/workflows/scrape.yml` to your repo. GitHub Actions runs the scraper every Monday at 09:00 UTC, commits new data, and Vercel auto-redeploys. Zero cost, zero servers, zero maintenance.
+Push `.github/workflows/scrape.yml` to GitHub. The action runs every Monday, commits new data, and Vercel auto-redeploys. The trend charts auto-populate as you accumulate scrape history.
 
-```yaml
-on:
-  schedule:
-    - cron: '0 9 * * 1'   # every Monday
-  workflow_dispatch:        # or trigger manually
+```
+Monday 09:00 UTC → Scrape → Aggregate → Git commit → Vercel redeploy
 ```
 
-See [`docs/automation/`](docs/automation/) for the full setup guide.
-
----
-
-## Free Data Sources
-
-| Source | URL | Notes |
-|--------|-----|-------|
-| **RemoteOK** | `remoteok.com/api` | Free JSON · no auth · remote AI/ML jobs |
-| **Arbeitnow** | `arbeitnow.com/api` | Free JSON · EU + remote · paginated |
-| **Jobicy** | `jobicy.com/api/v0/jobs` | Free tier · 50/call · filter by `tag=ai` |
-| **HN Who's Hiring** | `hn.algolia.com/api` | Monthly thread · free · highest signal quality |
-
-Want to add a source? See [`docs/scraping/adding-sources.md`](docs/scraping/).
+See [`docs/automation/`](docs/automation/) for the full guide.
 
 ---
 
 ## Dashboard Pages
 
-| Page | What you get |
+| Page | Description |
 |------|-------------|
-| **Dashboard** | Stats overview — skills, role types, remote split, key metrics |
-| **Skills Map** | Interactive pill cloud + ranked bars, filterable by category |
-| **Salaries** | Bar charts by role type + seniority, salary disclosure rates |
-| **Trends** | Area/line charts — job volume, salary, and skill growth over time |
-| **Job Browser** | Paginated table, multi-filter, sortable, real-time search |
-| **Skill Graph 3D** | Three.js constellation — hover for detail, drag to rotate |
-| **Roadmaps** | Phase-based learning paths for 5 different backgrounds |
-| **Sources** | Scrape history, methodology, automation setup, add-source guide |
+| **Dashboard** | High-level stats: top skills, role types, remote split, seniority breakdown |
+| **Skills Map** | Animated pill cloud + ranked bars, filterable by category |
+| **Salary Explorer** | Bar charts by role type and seniority, location comparison |
+| **Trends** | Area/line charts — job volume, salary, and skill demand over time |
+| **Job Browser** | Paginated table, multi-filter, sortable columns, real-time search |
+| **3D Skill Graph** | Three.js constellation — hover for count, drag to rotate, scroll to zoom |
+| **Roadmaps** | Phase-based learning paths for 5 different starting backgrounds |
+| **Sources & Docs** | Free API list, GitHub Actions setup, methodology, add-source guide |
+
+---
+
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 15 (App Router, TypeScript) |
+| Styling | Tailwind CSS + custom design system |
+| Charts | Recharts (area, bar, line, pie) |
+| 3D | Three.js (dynamic import for SSR safety) |
+| Animations | Framer Motion |
+| Fonts | Syne + JetBrains Mono |
+
+---
+
+## Free Data Sources
+
+| Source | API URL | Notes |
+|--------|---------|-------|
+| RemoteOK | `remoteok.com/api` | No auth · remote AI/ML jobs |
+| Arbeitnow | `arbeitnow.com/api` | No auth · EU + remote |
+| Jobicy | `jobicy.com/api/v0/jobs` | Free tier · filter by tag |
+| HN Who's Hiring | `hn.algolia.com/api` | Best signal quality |
+
+Want to add a source? See [`docs/scraping/`](docs/scraping/).
 
 ---
 
 ## Contributing
 
-- **New job sources** → [`docs/contributing/`](docs/contributing/)
-- **Roadmap improvements** → edit `web/src/components/pages/Roadmap.tsx`
-- **Bug reports** → open an issue with the error + your Python version
+- New job sources → [`docs/scraping/adding-sources.md`](docs/scraping/adding-sources.md)
+- Roadmap improvements → edit `web/src/components/pages/Roadmap.tsx`
+- Bug reports → open an issue with Python version + error output
 
 ---
 
 <div align="center">
 
-If this saved you time researching your job search:
+**If this saved you hours of research:**
 
-[![Buy Me A Coffee](https://img.shields.io/badge/☕_Buy_me_a_coffee-FF813A?style=for-the-badge)](https://buymeacoffee.com)
+[![Buy Me A Coffee](https://img.shields.io/badge/☕_Buy_me_a_coffee-FFDD00?style=for-the-badge&labelColor=FFDD00&color=000000)](https://www.buymeacoffee.com/allanito)
 
-*Data collected periodically from public job boards. Last scraped: see `data/raw/scrape_log.jsonl`*
+*Data collected from public job boards. See `data/raw/scrape_log.jsonl` for last scrape timestamp.*
 
 </div>
