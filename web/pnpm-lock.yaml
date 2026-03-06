@@ -34,7 +34,7 @@ importers:
         version: 0.170.0
     devDependencies:
       '@tailwindcss/postcss':
-        specifier: ^4.0.0
+        specifier: ^4.2.1
         version: 4.2.1
       '@types/node':
         specifier: ^22
@@ -61,7 +61,7 @@ importers:
         specifier: ^8.5.1
         version: 8.5.8
       tailwindcss:
-        specifier: ^4.0.0
+        specifier: ^4.2.1
         version: 4.2.1
       typescript:
         specifier: ^5
