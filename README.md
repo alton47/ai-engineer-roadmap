@@ -10,7 +10,7 @@ Built from scraped job postings. Zero API costs. Fully open source.
 [![Automation](https://img.shields.io/badge/automation-GitHub_Actions-9d7cff?style=flat-square&labelColor=111111)](.github/workflows/)
 [![License](https://img.shields.io/badge/license-MIT-3dffa0?style=flat-square&labelColor=111111)](LICENSE)
 
-[**→ Live Dashboard**](https://ai-engineer-roadmap.vercel.app) · [Data Docs](docs/data-interpretation/) · [Add a Source](docs/scraping/) · [Automate](docs/automation/)
+[**→ Live Dashboard**](https://ai-engineer-roadmap-nine.vercel.app/) · [Data Docs](docs/data-interpretation/) · [Add a Source](docs/scraping/) · [Automate](docs/automation/)
 
 ---
 
